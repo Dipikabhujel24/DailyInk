@@ -1,0 +1,146 @@
+/*THEME VARIABLES*/
+
+/* LIGHT THEME (DEFAULT) */
+.page.light-theme {
+    --bg-color: #ffffff;
+    --text-color: #212529;
+    --link-color: #006bb7;
+    --primary-color: #1b6ec2;
+    --primary-border: #1861ac;
+    --card-bg: #f8f9fa;
+    --navbar-bg: #212529;
+    --error-bg: #b32121;
+}
+
+/* DARK THEME */
+.page.dark-theme {
+    --bg-color: #121212;
+    --text-color: #f1f1f1;
+    --link-color: #90caf9;
+    --primary-color: #1976d2;
+    --primary-border: #1565c0;
+    --card-bg: #1e1e1e;
+    --navbar-bg: #000000;
+    --error-bg: #8b1a1a;
+}
+
+/*GLOBAL APP STYLES*/
+
+.page {
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+    .page a,
+    .page .btn-link {
+        color: var(--link-color);
+    }
+
+    .page .btn-primary {
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-border);
+    }
+
+    .page .card {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+
+    .page .navbar {
+        background-color: var(--navbar-bg) !important;
+    }
+
+    .page textarea,
+    .page input,
+    .page select {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border-color: #444;
+    }
+
+        .page textarea::placeholder,
+        .page input::placeholder {
+            color: #888;
+        }
+
+/* =========================
+   VALIDATION & ERRORS
+========================= */
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+/* BLAZOR ERROR UI*/
+
+#blazor-error-ui {
+    background: var(--error-bg);
+    color: white;
+}
+
+.mood-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.mood-card {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    text-align: center;
+    cursor: pointer;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+    .mood-card:hover {
+        transform: scale(1.05);
+    }
+
+    .mood-card.selected {
+        border-color: var(--primary-color);
+        background: rgba(25, 118, 210, 0.15);
+    }
+
+    .mood-card .emoji {
+        font-size: 30px;
+    }
+
+    .mood-card .label {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+.mood-chip-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mood-chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--card-bg);
+    cursor: pointer;
+    border: 1px solid var(--primary-border);
+    font-size: 14px;
+}
+
+    .mood-chip.active {
+        background: var(--primary-color);
+        color: white;
+    }

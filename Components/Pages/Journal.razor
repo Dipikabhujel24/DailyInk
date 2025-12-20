@@ -1,0 +1,148 @@
+﻿@page "/journal"
+@inject JournalService JournalService
+
+<h3>📝 Daily Journal</h3>
+<p class="text-muted">@DateTime.Now.ToString("dddd, MMMM dd yyyy")</p>
+
+<!-- PRIMARY MOOD -->
+<div class="card p-3 mb-3">
+    <h5>Primary Mood <span class="text-danger">*</span></h5>
+
+    <div class="mood-row">
+        @foreach (var mood in Moods)
+        {
+            <div class="mood-card @(Entry.PrimaryMood == mood.Name ? "selected" : "")"
+                 @onclick="() => Entry.PrimaryMood = mood.Name">
+
+                <div class="emoji">@mood.Emoji</div>
+                <div class="label">@mood.Name</div>
+            </div>
+        }
+    </div>
+
+    @if (primaryMoodError != null)
+    {
+        <div class="text-danger mt-2">@primaryMoodError</div>
+    }
+</div>
+
+<!-- SECONDARY MOODS -->
+<div class="card p-3 mb-3">
+    <h5>Secondary Moods (max 2)</h5>
+
+    <div class="mood-chip-container">
+        @foreach (var mood in Moods)
+        {
+            <span class="mood-chip @(Entry.SecondaryMoods.Contains(mood.Name) ? "active" : "")"
+                  @onclick="() => ToggleSecondary(mood.Name)">
+                @mood.Emoji @mood.Name
+            </span>
+        }
+    </div>
+
+    @if (secondaryMoodError != null)
+    {
+        <div class="text-danger mt-2">@secondaryMoodError</div>
+    }
+</div>
+
+<!-- JOURNAL TEXT -->
+<div class="card p-3 mb-3">
+    <h5>Your Thoughts</h5>
+    <textarea class="form-control"
+              rows="6"
+              placeholder="Write your thoughts..."
+              @bind="Entry.Content">
+    </textarea>
+</div>
+
+<button class="btn btn-primary me-2" @onclick="Save">
+    @(IsNew ? "Save Entry" : "Update Entry")
+</button>
+
+<button class="btn btn-danger"
+        disabled="@IsNew"
+        @onclick="Delete">
+    Delete Entry
+</button>
+
+@code {
+
+    JournalEntry Entry = new();
+    bool IsNew = true;
+
+    string? primaryMoodError;
+    string? secondaryMoodError;
+
+    List<MoodOption> Moods = new()
+    {
+        new() { Name = "Happy", Emoji = "😊" },
+        new() { Name = "Sad", Emoji = "😔" },
+        new() { Name = "Calm", Emoji = "😌" },
+        new() { Name = "Angry", Emoji = "😠" },
+        new() { Name = "Anxious", Emoji = "😟" },
+        new() { Name = "Excited", Emoji = "🤩" }
+    };
+
+    protected override void OnInitialized()
+    {
+        Load();
+    }
+
+    void Load()
+    {
+        var todayEntry = JournalService.GetTodayEntry();
+
+        if (todayEntry != null)
+        {
+            Entry = todayEntry;
+            IsNew = false;
+        }
+        else
+        {
+            Entry = new JournalEntry();
+            IsNew = true;
+        }
+    }
+
+    void ToggleSecondary(string mood)
+    {
+        secondaryMoodError = null;
+
+        if (Entry.SecondaryMoods.Contains(mood))
+        {
+            Entry.SecondaryMoods.Remove(mood);
+        }
+        else
+        {
+            if (Entry.SecondaryMoods.Count >= 2)
+            {
+                secondaryMoodError = "You can select up to 2 secondary moods only.";
+                return;
+            }
+            Entry.SecondaryMoods.Add(mood);
+        }
+    }
+
+    void Save()
+    {
+        primaryMoodError = null;
+
+        if (string.IsNullOrEmpty(Entry.PrimaryMood))
+        {
+            primaryMoodError = "Please select a primary mood.";
+            return;
+        }
+
+        Entry.UpdatedAt = DateTime.Now;
+
+        JournalService.SaveTodayEntry(Entry.Content);
+        Load();
+    }
+
+    void Delete()
+    {
+        JournalService.DeleteTodayEntry();
+        Load();
+    }
+}

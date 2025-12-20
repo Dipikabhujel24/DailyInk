@@ -1,0 +1,26 @@
+﻿@inject ThemeService ThemeService
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">DailyInk</a>
+    </div>
+</div>
+
+<div class="nav-scrollable">
+    <nav class="nav flex-column">
+
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            Home
+        </NavLink>
+
+        <NavLink class="nav-link" href="journal">
+            Journal
+        </NavLink>
+
+        <button class="btn btn-outline-light"
+                @onclick="ThemeService.ToggleTheme">
+            @(ThemeService.IsDark ? "Light Mode ☀️" : "Dark Mode 🌙")
+        </button>
+
+    </nav>
+</div>
