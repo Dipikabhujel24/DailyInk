@@ -24,7 +24,7 @@ public class JournalRepository
                   .FirstOrDefault(e => e.EntryDate == date.Date);
     }
 
-    // 🔍 SEARCH BY TITLE + CONTENT
+    // SEARCH
     public List<JournalEntry> Search(string keyword)
     {
         if (string.IsNullOrWhiteSpace(keyword))
@@ -49,7 +49,7 @@ public class JournalRepository
     {
         var query = _db.GetAllEntries().AsQueryable();
 
-        // 🔍 Title / Content search
+        // Title / Content search
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             keyword = keyword.ToLower();
@@ -59,18 +59,18 @@ public class JournalRepository
                 e.Content.ToLower().Contains(keyword));
         }
 
-        // 📅 Date range filter
+        // Date range filter
         if (fromDate.HasValue)
             query = query.Where(e => e.EntryDate >= fromDate.Value);
 
         if (toDate.HasValue)
             query = query.Where(e => e.EntryDate <= toDate.Value);
 
-        // 😊 Mood filter (primary)
+        // Mood filter (primary)
         if (!string.IsNullOrWhiteSpace(mood))
             query = query.Where(e => e.PrimaryMood == mood);
 
-        // 🏷 Tag filter (comma-separated)
+        // Tag filter (comma-separated)
         if (!string.IsNullOrWhiteSpace(tag))
             query = query.Where(e =>
                 !string.IsNullOrEmpty(e.Tags) &&

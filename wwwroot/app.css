@@ -1,13 +1,14 @@
-﻿html, body {
+﻿/* ====== GLOBAL RESET ====== */
+
+html, body {
     margin: 0;
     padding: 0;
     height: 100%;
 }
-/* =====================================================
-   THEME VARIABLES
-===================================================== */
 
-/* LIGHT THEME (DEFAULT) */
+/* ====== THEME VARIABLES ======= */
+
+/* LIGHT THEME */
 .page.light-theme {
     --bg-color: #ffffff;
     --text-color: #212529;
@@ -32,35 +33,24 @@
 }
 
 
-/* =====================================================
-   GLOBAL APP STYLES
-===================================================== */
+/* ====== BASE PAGE STYLES ======= */
 
 .page {
     min-height: 100vh;
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-    .page a,
-    .page .btn-link {
+    .page a {
         color: var(--link-color);
+        text-decoration: none;
     }
 
     .page .btn-primary {
         color: #ffffff;
         background-color: var(--primary-color);
         border-color: var(--primary-border);
-    }
-
-    .page .card {
-        background-color: var(--card-bg);
-        color: var(--text-color);
-    }
-
-    .page .navbar {
-        background-color: var(--navbar-bg) !important;
     }
 
     .page textarea,
@@ -77,18 +67,7 @@
         }
 
 
-/* =====================================================
-   LAYOUT STRUCTURE
-===================================================== */
-
-/* ===== LAYOUT STRUCTURE ===== */
-
-.page {
-    height: 100%;
-    background-color: var(--bg-color);
-}
-
-/* ===== LAYOUT STRUCTURE ===== */
+/* ======= MAIN LAYOUT STRUCTURE ======= */
 
 .app-layout {
     display: flex;
@@ -96,40 +75,38 @@
     overflow: hidden;
 }
 
+/* Sidebar */
 .sidebar {
     width: 260px;
     padding: 24px;
     background: linear-gradient(180deg, #0b1c2d, #4b116f);
-    overflow: hidden;
     flex-shrink: 0;
-    position: relative;
-    z-index: 1;
+    overflow-y: auto;
 }
 
+/* Main content area */
 .content {
     flex: 1;
-    display: flex;
-    justify-content: center;
     padding: 32px;
     overflow-y: auto;
     background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
 }
 
+/* GLOBAL CENTER COLUMN – ALL PAGES */
 .content-center {
-    max-width: 900px; 
-    margin: 0 auto; 
+    max-width: 900px;
     width: 100%;
 }
 
-/* =====================================================
-   SIDEBAR NAVIGATION
-===================================================== */
+
+/* ====== SIDEBAR NAVIGATION ====== */
 
 .sidebar a {
     display: block;
     margin: 14px 0;
     font-size: 18px;
-    text-decoration: none;
     color: var(--link-color);
 }
 
@@ -138,8 +115,8 @@
         color: #ffffff;
     }
 
-.sidebar .navbar-brand,
-.sidebar .brand {
+.sidebar .brand,
+.sidebar .navbar-brand {
     margin-bottom: 24px;
     font-size: 22px;
     font-weight: bold;
@@ -147,47 +124,16 @@
 }
 
 
-/* =====================================================
-   FORM VALIDATION & ERRORS
-===================================================== */
+/* ====== CARDS ====== */
 
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid #e50000;
-}
-
-.validation-message {
-    color: #e50000;
+.card {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 10px;
 }
 
 
-/* =====================================================
-   BLAZOR ERROR UI
-===================================================== */
-
-#blazor-error-ui {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background: var(--error-bg);
-    color: white;
-    display: none;
-    z-index: 1000;
-}
-
-    #blazor-error-ui.show {
-        display: block;
-    }
-
-
-/* =====================================================
-   JOURNAL MOOD UI
-===================================================== */
+/* ====== JOURNAL – MOODS ====== */
 
 .mood-row {
     display: flex;
@@ -204,7 +150,7 @@
     border-radius: 12px;
     border: 2px solid transparent;
     background: var(--card-bg);
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
     .mood-card:hover {
@@ -226,43 +172,40 @@
     }
 
 
-/* =====================================================
-   SECONDARY MOOD CHIPS
-===================================================== */
-
-.mood-chip-container {
+/* ===== SECONDARY MOODS ====== */
+.secondary-mood-chip-container {
     display: flex;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 8px;
 }
 
-.mood-chip {
+.secondary-mood-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 6px 12px;
+    border-radius: 16px;
+    background-color: var(--primary-color);
+    color: white;
     font-size: 14px;
-    cursor: pointer;
-    border-radius: 20px;
-    border: 1px solid var(--primary-border);
-    background: var(--card-bg);
 }
 
-    .mood-chip.active {
-        background: var(--primary-color);
-        color: #ffffff;
+    .secondary-mood-chip .remove-btn {
+        border: none;
+        background: transparent;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
     }
 
-
-/* =====================================================
-   CALENDAR LAYOUT & CENTERING
-===================================================== */
+/* =========================
+   CALENDAR (CENTERED LIKE JOURNAL)
+========================= */
 
 .calendar-wrapper {
     max-width: 900px;
-    margin: 0 auto; 
+    margin: 0 auto;
     text-align: center;
-}
-
-.calendar-title {
-    margin-bottom: 16px;
 }
 
 .calendar-header {
@@ -276,13 +219,13 @@
 .calendar-table {
     width: 100%;
     border-collapse: collapse;
+    background: var(--card-bg);
 }
 
     .calendar-table th,
     .calendar-table td {
         border: 1px solid #ddd;
         padding: 12px;
-        text-align: center;
     }
 
 .calendar-day {
@@ -295,7 +238,37 @@
         color: white;
     }
 
-.sidebar,
-.sidebar * {
-    pointer-events: auto;
+    .calendar-day.today {
+        font-weight: bold;
+        background-color: #f1f3f5;
+    }
+
+/* ===== VALIDATION & ERRORS ====== */
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
 }
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+#blazor-error-ui {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: var(--error-bg);
+    color: white;
+    z-index: 1000;
+    display: none;
+}
+
+    #blazor-error-ui.show {
+        display: block;
+    }

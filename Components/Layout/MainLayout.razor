@@ -4,15 +4,14 @@
 
 <div class="page @(ThemeService.IsDark ? "dark-theme" : "light-theme")">
     <div class="app-layout">
-
         <aside class="sidebar">
             <NavMenu />
         </aside>
 
         <main class="content">
-            <section class="content-center">
+            <div class="content-center">
                 @Body
-            </section>
+            </div>
         </main>
 
     </div>

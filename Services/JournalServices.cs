@@ -24,7 +24,7 @@ public class JournalService
     }
 
 
-    // 🔍 SEARCH
+    // SEARCH
     public List<JournalEntry> Search(string keyword)
         => _repo.Search(keyword);
 
@@ -108,4 +108,42 @@ public class JournalService
 
         return missedDays;
     }
+
+    public Dictionary<string, int> GetPrimaryMoodDistribution()
+    {
+        return GetAllEntries()
+            .Where(e => !string.IsNullOrWhiteSpace(e.PrimaryMood))
+            .GroupBy(e => e.PrimaryMood!)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
+    public Dictionary<string, int> GetSecondaryMoodDistribution()
+    {
+        return GetAllEntries()
+            .SelectMany(e => e.SecondaryMoods)
+            .GroupBy(m => m)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
+    public Dictionary<string, int> GetTagUsage()
+    {
+        return GetAllEntries()
+            .Where(e => !string.IsNullOrWhiteSpace(e.Tags))
+            .SelectMany(e => e.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            .Select(t => t.Trim())
+            .GroupBy(t => t)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
+    public Dictionary<DateTime, int> GetWordCountByDate()
+    {
+        return GetAllEntries()
+            .Where(e => !string.IsNullOrWhiteSpace(e.Content))
+            .GroupBy(e => e.EntryDate)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(e => e.Content.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length)
+            );
+    }
+
 }

@@ -37,14 +37,31 @@
 
 <!-- SECONDARY MOODS -->
 <div class="card p-3 mb-3">
-    <h5>Secondary Moods (max 2)</h5>
+    <h5>Secondary Moods <small class="text-muted">(optional, max 2)</small></h5>
 
-    <div class="mood-chip-container">
-        @foreach (var mood in Moods)
+    <div class="d-flex gap-2 mb-2">
+        <input class="form-control"
+               placeholder="Type a mood (e.g. tired, hopeful)"
+               @bind="SecondaryMoodInput"
+               @bind:event="oninput"
+               disabled="@(Entry.SecondaryMoods.Count >= 2)" />
+
+        <button class="btn btn-outline-primary"
+                @onclick="AddSecondaryMood"
+                disabled="@(Entry.SecondaryMoods.Count >= 2 || string.IsNullOrWhiteSpace(SecondaryMoodInput))">
+            Add
+        </button>
+    </div>
+
+    <div class="secondary-mood-chip-container">
+        @foreach (var mood in Entry.SecondaryMoods)
         {
-            <span class="mood-chip @(Entry.SecondaryMoods.Contains(mood.Name) ? "active" : "")"
-                  @onclick="() => ToggleSecondary(mood.Name)">
-                @mood.Emoji @mood.Name
+            <span class="secondary-mood-chip">
+                @mood
+                <button class="remove-btn"
+                        @onclick="() => RemoveSecondaryMood(mood)">
+                    ✕
+                </button>
             </span>
         }
     </div>
@@ -148,28 +165,34 @@
     }
 
 
-    void ToggleSecondary(string mood)
+    string SecondaryMoodInput = "";
+
+    void AddSecondaryMood()
     {
         secondaryMoodError = null;
 
-        if (Entry.SecondaryMoods.Contains(mood))
+        if (Entry.SecondaryMoods.Count >= 2)
         {
-            Entry.SecondaryMoods.Remove(mood);
-        }
-        else
-        {
-            if (Entry.SecondaryMoods.Count >= 2)
-            {
-                secondaryMoodError = "You can select up to 2 secondary moods only.";
-                return;
-            }
-
-            Entry.SecondaryMoods.Add(mood);
+            secondaryMoodError = "You can add up to 2 secondary moods only.";
+            return;
         }
 
-        StateHasChanged();
+        var mood = SecondaryMoodInput.Trim();
+
+        if (Entry.SecondaryMoods.Contains(mood, StringComparer.OrdinalIgnoreCase))
+        {
+            secondaryMoodError = "This mood is already added.";
+            return;
+        }
+
+        Entry.SecondaryMoods.Add(mood);
+        SecondaryMoodInput = "";
     }
 
+    void RemoveSecondaryMood(string mood)
+    {
+        Entry.SecondaryMoods.Remove(mood);
+    }
 
     void SaveEntry()
     {

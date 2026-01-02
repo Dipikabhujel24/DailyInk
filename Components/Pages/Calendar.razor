@@ -2,56 +2,53 @@
 @inject JournalService JournalService
 @inject NavigationManager NavigationManager
 
-<h3>📅 Journal Calendar</h3>
+<div class="calendar-wrapper">
 
-<div class="d-flex align-items-center mb-3">
-    <button class="btn btn-outline-secondary me-2" @onclick="PrevMonth">
-        ◀
-    </button>
+    <h3 class="calendar-title">📅 Journal Calendar</h3>
 
-    <h5 class="mb-0">@CurrentMonth.ToString("MMMM yyyy")</h5>
+    <div class="calendar-header">
+        <button class="btn btn-outline-secondary" @onclick="PrevMonth">◀</button>
+        <h5>@CurrentMonth.ToString("MMMM yyyy")</h5>
+        <button class="btn btn-outline-secondary" @onclick="NextMonth">▶</button>
+    </div>
 
-    <button class="btn btn-outline-secondary ms-2" @onclick="NextMonth">
-        ▶
-    </button>
-</div>
-
-<table class="table table-bordered text-center">
-    <thead>
-        <tr>
-            <th>Sun</th>
-            <th>Mon</th>
-            <th>Tue</th>
-            <th>Wed</th>
-            <th>Thu</th>
-            <th>Fri</th>
-            <th>Sat</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var week in CalendarWeeks)
-        {
+    <table class="calendar-table">
+        <thead>
             <tr>
-                @foreach (var day in week)
-                {
-                    <td class="@GetDayClass(day)"
-                        @onclick="() => OpenDay(day)">
-                        @day.Day
-                    </td>
-                }
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var week in CalendarWeeks)
+            {
+                <tr>
+                    @foreach (var day in week)
+                    {
+                        <td class="@GetDayClass(day)"
+                            @onclick="() => OpenDay(day)">
+                            @day.Day
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<p class="mt-2 text-muted">
-    • Highlighted dates contain journal entries
-</p>
+    <p class="mt-2 text-muted">
+        • Highlighted dates contain journal entries
+    </p>
+
+</div>
 
 @code {
     DateTime CurrentMonth = DateTime.Today;
     List<List<DateTime>> CalendarWeeks = new();
-
     HashSet<DateTime> EntryDates = new();
 
     protected override void OnInitialized()
@@ -63,8 +60,7 @@
     {
         CalendarWeeks.Clear();
 
-        var entries = JournalService.GetAllEntries();
-        EntryDates = entries
+        EntryDates = JournalService.GetAllEntries()
             .Select(e => e.EntryDate)
             .ToHashSet();
 
@@ -98,10 +94,10 @@
     string GetDayClass(DateTime day)
     {
         if (EntryDates.Contains(day.Date))
-            return "bg-success text-white calendar-day";
+            return "calendar-day has-entry";
 
         if (day.Date == DateTime.Today)
-            return "bg-light fw-bold calendar-day";
+            return "calendar-day today";
 
         return "calendar-day";
     }

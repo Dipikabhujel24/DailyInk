@@ -28,9 +28,7 @@ namespace DailyInk
             builder.Services.AddSingleton<AppDatabase>(
                 _ => new AppDatabase(dbPath));
 
-            // =========================
-            // REPOSITORIES & SERVICES
-            // =========================
+            // ====== REPOSITORIES & SERVICES ====== //
             builder.Services.AddSingleton<JournalRepository>();
             builder.Services.AddScoped<JournalService>();
             builder.Services.AddSingleton<MarkdownService>();

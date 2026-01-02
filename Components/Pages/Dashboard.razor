@@ -1,45 +1,106 @@
 ﻿@page "/dashboard"
 @inject JournalService JournalService
 
-<h3>📊 Journal Streak Dashboard</h3>
+<div class="content-center">
 
-<div class="card p-3 mb-3">
-    <h5>🔥 Current Streak</h5>
-    <p class="fs-4">@CurrentStreak days</p>
-</div>
+    <h2 class="mb-4">📊 Dashboard Insights</h2>
 
-<div class="card p-3 mb-3">
-    <h5>🏆 Longest Streak</h5>
-    <p class="fs-4">@LongestStreak days</p>
-</div>
+    <!-- STREAKS -->
+    <div class="card p-3 mb-4">
+        <h5>🔥 Writing Streaks</h5>
+        <p>Current Streak: <strong>@JournalService.GetCurrentStreak()</strong> days</p>
+        <p>Longest Streak: <strong>@JournalService.GetLongestStreak()</strong> days</p>
+    </div>
 
-<div class="card p-3 mb-3">
-    <h5>❌ Missed Days</h5>
+    <!-- PRIMARY MOODS -->
+    <div class="card p-3 mb-4">
+        <h5>😊 Primary Mood Distribution</h5>
 
-    @if (!MissedDays.Any())
-    {
-        <p>No missed days 🎉</p>
-    }
-    else
-    {
-        <ul>
-            @foreach (var day in MissedDays)
-            {
-                <li>@day.ToString("dd MMM yyyy")</li>
-            }
-        </ul>
-    }
+        @if (PrimaryMoods.Any())
+        {
+            <ul>
+                @foreach (var item in PrimaryMoods)
+                {
+                    <li>@item.Key — <strong>@item.Value</strong></li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">No data yet</p>
+        }
+    </div>
+
+    <!-- SECONDARY MOODS -->
+    <div class="card p-3 mb-4">
+        <h5>✨ Frequent Secondary Moods</h5>
+
+        @if (SecondaryMoods.Any())
+        {
+            <ul>
+                @foreach (var item in SecondaryMoods)
+                {
+                    <li>@item.Key — <strong>@item.Value</strong></li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">No data yet</p>
+        }
+    </div>
+
+    <!-- TAGS -->
+    <div class="card p-3 mb-4">
+        <h5>🏷 Most Used Tags</h5>
+
+        @if (Tags.Any())
+        {
+            <ul>
+                @foreach (var item in Tags)
+                {
+                    <li>@item.Key — <strong>@item.Value</strong></li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">No tags yet</p>
+        }
+    </div>
+
+    <!-- WORD COUNT -->
+    <div class="card p-3 mb-4">
+        <h5>📝 Word Count by Day</h5>
+
+        @if (WordCounts.Any())
+        {
+            <ul>
+                @foreach (var item in WordCounts.OrderBy(d => d.Key))
+                {
+                    <li>@item.Key.ToString("dd MMM yyyy") — <strong>@item.Value</strong> words</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">No entries yet</p>
+        }
+    </div>
+
 </div>
 
 @code {
-    int CurrentStreak;
-    int LongestStreak;
-    List<DateTime> MissedDays = new();
+    Dictionary<string, int> PrimaryMoods = new();
+    Dictionary<string, int> SecondaryMoods = new();
+    Dictionary<string, int> Tags = new();
+    Dictionary<DateTime, int> WordCounts = new();
 
     protected override void OnInitialized()
     {
-        CurrentStreak = JournalService.GetCurrentStreak();
-        LongestStreak = JournalService.GetLongestStreak();
-        MissedDays = JournalService.GetMissedDays();
+        PrimaryMoods = JournalService.GetPrimaryMoodDistribution();
+        SecondaryMoods = JournalService.GetSecondaryMoodDistribution();
+        Tags = JournalService.GetTagUsage();
+        WordCounts = JournalService.GetWordCountByDate();
     }
 }
