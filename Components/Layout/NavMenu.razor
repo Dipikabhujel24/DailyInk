@@ -12,12 +12,24 @@
         <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
             Home
         </NavLink>
-
         <NavLink class="nav-link" href="journal">
             Journal
         </NavLink>
+        <NavLink class="nav-link" href="search">
+            Search
+        </NavLink>
+        <NavLink class="nav-link" href="dashboard">
+            Dashboard
+        </NavLink>
+        <NavLink class="nav-link" href="entries">
+            Entries
+        </NavLink>
+        <NavLink class="nav-link" href="calendar">
+            Calendar
+        </NavLink>
 
-        <button class="btn btn-outline-light"
+
+        <button class="btn btn-outline-secondary"
                 @onclick="ThemeService.ToggleTheme">
             @(ThemeService.IsDark ? "Light Mode ☀️" : "Dark Mode 🌙")
         </button>

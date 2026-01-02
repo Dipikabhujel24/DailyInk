@@ -15,7 +15,6 @@ namespace DailyInk.Services
             IsDark = !IsDark;
             OnThemeChanged?.Invoke();
         }
-
         public string CssClass => IsDark ? "dark-theme" : "light-theme";
     }
 }

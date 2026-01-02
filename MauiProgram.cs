@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using DailyInk.Repositories;
 using DailyInk.Services;
+using DailyInk.Data;
 
 namespace DailyInk
 {
@@ -20,13 +21,22 @@ namespace DailyInk
             // Blazor WebView
             builder.Services.AddMauiBlazorWebView();
 
-            // Register Journal Services
+            var dbPath = Path.Combine(
+                FileSystem.AppDataDirectory,
+                "dailyink.db");
+
+            builder.Services.AddSingleton<AppDatabase>(
+                _ => new AppDatabase(dbPath));
+
+            // =========================
+            // REPOSITORIES & SERVICES
+            // =========================
             builder.Services.AddSingleton<JournalRepository>();
             builder.Services.AddScoped<JournalService>();
-            // Theme Services
+            builder.Services.AddSingleton<MarkdownService>();
+
+            // Theme Service
             builder.Services.AddSingleton<ThemeService>();
-
-
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

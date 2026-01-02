@@ -1,8 +1,18 @@
 ﻿@page "/journal"
+
 @inject JournalService JournalService
+@inject MarkdownService MarkdownService
 
 <h3>📝 Daily Journal</h3>
 <p class="text-muted">@DateTime.Now.ToString("dddd, MMMM dd yyyy")</p>
+
+<!-- TITLE -->
+<div class="card p-3 mb-3">
+    <h5>Title</h5>
+    <input class="form-control"
+           placeholder="Enter a title for today..."
+           @bind="Entry.Title" />
+</div>
 
 <!-- PRIMARY MOOD -->
 <div class="card p-3 mb-3">
@@ -13,7 +23,6 @@
         {
             <div class="mood-card @(Entry.PrimaryMood == mood.Name ? "selected" : "")"
                  @onclick="() => Entry.PrimaryMood = mood.Name">
-
                 <div class="emoji">@mood.Emoji</div>
                 <div class="label">@mood.Name</div>
             </div>
@@ -46,28 +55,58 @@
     }
 </div>
 
-<!-- JOURNAL TEXT -->
+<!-- MARKDOWN CONTENT -->
 <div class="card p-3 mb-3">
-    <h5>Your Thoughts</h5>
-    <textarea class="form-control"
-              rows="6"
-              placeholder="Write your thoughts..."
+    <h5>Your Thoughts (Markdown Supported)</h5>
+
+    <textarea class="form-control mb-3"
+              rows="8"
+              placeholder="Write using Markdown..."
               @bind="Entry.Content">
     </textarea>
+
+    <h6>Preview</h6>
+    <div class="border p-3 markdown-preview">
+        @((MarkupString)MarkdownService.ToHtml(Entry.Content))
+    </div>
 </div>
 
-<button class="btn btn-primary me-2" @onclick="Save">
-    @(IsNew ? "Save Entry" : "Update Entry")
-</button>
+<!-- TAGS -->
+<div class="card p-3 mb-3">
+    <h5>Tags</h5>
+    <input class="form-control"
+           placeholder="e.g. Work, Health, Travel"
+           @bind="Entry.Tags" />
+</div>
 
-<button class="btn btn-danger"
-        disabled="@IsNew"
-        @onclick="Delete">
-    Delete Entry
-</button>
+<!-- ACTION BUTTONS -->
+<div class="mt-3">
+
+    <!-- SAVE BUTTON -->
+    <button class="btn btn-success me-2"
+            disabled="@(!IsNew)"
+            @onclick="SaveEntry">
+        Save
+    </button>
+
+    <!-- UPDATE BUTTON -->
+    <button class="btn btn-primary me-2"
+            disabled="@(IsNew)"
+            @onclick="UpdateEntry">
+        Update
+    </button>
+
+    <!-- DELETE BUTTON -->
+    <button class="btn btn-danger"
+            disabled="@(IsNew)"
+            @onclick="Delete">
+        Delete
+    </button>
+
+</div>
+
 
 @code {
-
     JournalEntry Entry = new();
     bool IsNew = true;
 
@@ -96,6 +135,9 @@
         if (todayEntry != null)
         {
             Entry = todayEntry;
+
+            _ = Entry.SecondaryMoods;
+
             IsNew = false;
         }
         else
@@ -104,6 +146,7 @@
             IsNew = true;
         }
     }
+
 
     void ToggleSecondary(string mood)
     {
@@ -120,25 +163,47 @@
                 secondaryMoodError = "You can select up to 2 secondary moods only.";
                 return;
             }
+
             Entry.SecondaryMoods.Add(mood);
         }
+
+        StateHasChanged();
     }
 
-    void Save()
+
+    void SaveEntry()
     {
         primaryMoodError = null;
 
-        if (string.IsNullOrEmpty(Entry.PrimaryMood))
+        if (string.IsNullOrWhiteSpace(Entry.PrimaryMood))
         {
             primaryMoodError = "Please select a primary mood.";
             return;
         }
 
-        Entry.UpdatedAt = DateTime.Now;
+        Entry.SecondaryMoodsRaw = string.Join(",", Entry.SecondaryMoods);
 
-        JournalService.SaveTodayEntry(Entry.Content);
+        JournalService.SaveTodayEntry(Entry);
         Load();
     }
+
+
+    void UpdateEntry()
+    {
+        primaryMoodError = null;
+
+        if (string.IsNullOrWhiteSpace(Entry.PrimaryMood))
+        {
+            primaryMoodError = "Please select a primary mood.";
+            return;
+        }
+
+        Entry.SecondaryMoodsRaw = string.Join(",", Entry.SecondaryMoods);
+
+        JournalService.SaveTodayEntry(Entry);
+        Load();
+    }
+
 
     void Delete()
     {

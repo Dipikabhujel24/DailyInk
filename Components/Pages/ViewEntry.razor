@@ -1,0 +1,42 @@
+﻿@page "/view/{EntryId:int}"
+@inject JournalService JournalService
+
+@if (entry == null)
+{
+    <p>Entry not found.</p>
+}
+else
+{
+    <h3>@entry.Title</h3>
+    <p class="text-muted">
+        @entry.EntryDate.ToString("dddd, dd MMMM yyyy")
+    </p>
+
+    <p><strong>Primary Mood:</strong> @entry.PrimaryMood</p>
+
+    @if (entry.SecondaryMoods.Any())
+    {
+        <p>
+            <strong>Secondary Moods:</strong>
+            @string.Join(", ", entry.SecondaryMoods)
+        </p>
+    }
+
+    <hr />
+
+    <p>@entry.Content</p>
+}
+
+@code {
+    [Parameter]
+    public int EntryId { get; set; }
+
+    JournalEntry? entry;
+
+    protected override void OnInitialized()
+    {
+        entry = JournalService
+            .GetAllEntries()
+            .FirstOrDefault(e => e.EntryId == EntryId);
+    }
+}

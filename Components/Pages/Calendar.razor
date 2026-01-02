@@ -1,0 +1,117 @@
+﻿@page "/calendar"
+@inject JournalService JournalService
+@inject NavigationManager NavigationManager
+
+<h3>📅 Journal Calendar</h3>
+
+<div class="d-flex align-items-center mb-3">
+    <button class="btn btn-outline-secondary me-2" @onclick="PrevMonth">
+        ◀
+    </button>
+
+    <h5 class="mb-0">@CurrentMonth.ToString("MMMM yyyy")</h5>
+
+    <button class="btn btn-outline-secondary ms-2" @onclick="NextMonth">
+        ▶
+    </button>
+</div>
+
+<table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>Sun</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var week in CalendarWeeks)
+        {
+            <tr>
+                @foreach (var day in week)
+                {
+                    <td class="@GetDayClass(day)"
+                        @onclick="() => OpenDay(day)">
+                        @day.Day
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p class="mt-2 text-muted">
+    • Highlighted dates contain journal entries
+</p>
+
+@code {
+    DateTime CurrentMonth = DateTime.Today;
+    List<List<DateTime>> CalendarWeeks = new();
+
+    HashSet<DateTime> EntryDates = new();
+
+    protected override void OnInitialized()
+    {
+        LoadMonth();
+    }
+
+    void LoadMonth()
+    {
+        CalendarWeeks.Clear();
+
+        var entries = JournalService.GetAllEntries();
+        EntryDates = entries
+            .Select(e => e.EntryDate)
+            .ToHashSet();
+
+        var firstDay = new DateTime(CurrentMonth.Year, CurrentMonth.Month, 1);
+        var startDate = firstDay.AddDays(-(int)firstDay.DayOfWeek);
+
+        for (int week = 0; week < 6; week++)
+        {
+            var days = new List<DateTime>();
+            for (int day = 0; day < 7; day++)
+            {
+                days.Add(startDate);
+                startDate = startDate.AddDays(1);
+            }
+            CalendarWeeks.Add(days);
+        }
+    }
+
+    void PrevMonth()
+    {
+        CurrentMonth = CurrentMonth.AddMonths(-1);
+        LoadMonth();
+    }
+
+    void NextMonth()
+    {
+        CurrentMonth = CurrentMonth.AddMonths(1);
+        LoadMonth();
+    }
+
+    string GetDayClass(DateTime day)
+    {
+        if (EntryDates.Contains(day.Date))
+            return "bg-success text-white calendar-day";
+
+        if (day.Date == DateTime.Today)
+            return "bg-light fw-bold calendar-day";
+
+        return "calendar-day";
+    }
+
+    void OpenDay(DateTime day)
+    {
+        var entry = JournalService.GetEntryByDate(day);
+        if (entry != null)
+        {
+            NavigationManager.NavigateTo($"/view/{entry.EntryId}");
+        }
+    }
+}

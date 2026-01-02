@@ -1,0 +1,98 @@
+﻿@page "/search"
+@inject JournalService JournalService
+@inject NavigationManager NavigationManager
+
+<h3>🔍 Search & Filter Journals</h3>
+
+<div class="card p-3 mb-3">
+    <input class="form-control mb-2"
+           placeholder="Search by title or content"
+           @bind="keyword" />
+
+    <div class="row mb-2">
+        <div class="col">
+            <label>From</label>
+            <input type="date" class="form-control" @bind="fromDate" />
+        </div>
+
+        <div class="col">
+            <label>To</label>
+            <input type="date" class="form-control" @bind="toDate" />
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <label>Primary Mood</label>
+        <select class="form-select" @bind="mood">
+            <option value="">All</option>
+            @foreach (var m in moods)
+            {
+                <option value="@m">@m</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label>Tag</label>
+        <input class="form-control"
+               placeholder="e.g. Work, Health"
+               @bind="tag" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="ApplyFilters">
+        Apply Filters
+    </button>
+</div>
+
+@if (results.Any())
+{
+    <ul class="list-group">
+        @foreach (var entry in results)
+        {
+            <li class="list-group-item"
+                style="cursor:pointer"
+                @onclick="() => Open(entry.EntryId)">
+                <strong>@entry.Title</strong><br />
+                <small>@entry.EntryDate.ToString("dd MMM yyyy")</small><br />
+                Mood: @entry.PrimaryMood
+            </li>
+        }
+    </ul>
+}
+else if (searched)
+{
+    <p>No matching entries found.</p>
+}
+
+@code {
+    string keyword = "";
+    DateTime? fromDate;
+    DateTime? toDate;
+    string? mood;
+    string? tag;
+
+    bool searched = false;
+    List<JournalEntry> results = new();
+
+    List<string> moods = new()
+    {
+        "Happy", "Sad", "Calm", "Angry", "Anxious", "Excited"
+    };
+
+    void ApplyFilters()
+    {
+        searched = true;
+
+        results = JournalService.SearchAndFilter(
+            keyword,
+            fromDate,
+            toDate,
+            mood,
+            tag);
+    }
+
+    void Open(int id)
+    {
+        NavigationManager.NavigateTo($"/view/{id}");
+    }
+}

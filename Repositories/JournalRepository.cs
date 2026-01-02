@@ -1,40 +1,89 @@
-﻿using DailyInk.Models;
+﻿using DailyInk.Data;
+using DailyInk.Models;
 
 namespace DailyInk.Repositories;
 
 public class JournalRepository
 {
-    private readonly List<JournalEntry> _entries = new();
+    private readonly AppDatabase _db;
+
+    public JournalRepository(AppDatabase db)
+    {
+        _db = db;
+    }
 
     public JournalEntry? GetTodayEntry()
-        => _entries.FirstOrDefault(e => e.EntryDate == DateTime.Today);
+        => _db.GetTodayEntry();
 
-    public void SaveToday(string content)
+    public List<JournalEntry> GetAll()
+        => _db.GetAllEntries();
+
+    public JournalEntry? GetByDate(DateTime date)
     {
-        var entry = GetTodayEntry();
-
-        if (entry == null)
-        {
-            _entries.Add(new JournalEntry
-            {
-                EntryId = _entries.Count + 1,
-                EntryDate = DateTime.Today,
-                Content = content,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            });
-        }
-        else
-        {
-            entry.Content = content;
-            entry.UpdatedAt = DateTime.Now;
-        }
+        return _db.GetAllEntries()
+                  .FirstOrDefault(e => e.EntryDate == date.Date);
     }
+
+    // 🔍 SEARCH BY TITLE + CONTENT
+    public List<JournalEntry> Search(string keyword)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+            return GetAll();
+
+        keyword = keyword.ToLower();
+
+        return _db.GetAllEntries()
+            .Where(e =>
+                (!string.IsNullOrEmpty(e.Title) &&
+                 e.Title.ToLower().Contains(keyword)) ||
+                e.Content.ToLower().Contains(keyword))
+            .ToList();
+    }
+
+    public List<JournalEntry> SearchAndFilter(
+    string keyword,
+    DateTime? fromDate,
+    DateTime? toDate,
+    string? mood,
+    string? tag)
+    {
+        var query = _db.GetAllEntries().AsQueryable();
+
+        // 🔍 Title / Content search
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            keyword = keyword.ToLower();
+            query = query.Where(e =>
+                (!string.IsNullOrEmpty(e.Title) &&
+                 e.Title.ToLower().Contains(keyword)) ||
+                e.Content.ToLower().Contains(keyword));
+        }
+
+        // 📅 Date range filter
+        if (fromDate.HasValue)
+            query = query.Where(e => e.EntryDate >= fromDate.Value);
+
+        if (toDate.HasValue)
+            query = query.Where(e => e.EntryDate <= toDate.Value);
+
+        // 😊 Mood filter (primary)
+        if (!string.IsNullOrWhiteSpace(mood))
+            query = query.Where(e => e.PrimaryMood == mood);
+
+        // 🏷 Tag filter (comma-separated)
+        if (!string.IsNullOrWhiteSpace(tag))
+            query = query.Where(e =>
+                !string.IsNullOrEmpty(e.Tags) &&
+                e.Tags.ToLower().Contains(tag.ToLower()));
+
+        return query
+            .OrderByDescending(e => e.EntryDate)
+            .ToList();
+    }
+
+    public void SaveToday(JournalEntry entry)
+        => _db.SaveToday(entry);
 
     public void DeleteToday()
-    {
-        var entry = GetTodayEntry();
-        if (entry != null)
-            _entries.Remove(entry);
-    }
+        => _db.DeleteToday();
 }
