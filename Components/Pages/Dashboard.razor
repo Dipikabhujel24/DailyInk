@@ -8,8 +8,29 @@
     <!-- STREAKS -->
     <div class="card p-3 mb-4">
         <h5>🔥 Writing Streaks</h5>
-        <p>Current Streak: <strong>@JournalService.GetCurrentStreak()</strong> days</p>
-        <p>Longest Streak: <strong>@JournalService.GetLongestStreak()</strong> days</p>
+        <p>Current Streak: <strong>@CurrentStreak</strong> days</p>
+        <p>Longest Streak: <strong>@LongestStreak</strong> days</p>
+    </div>
+
+    <!-- MISSED DAYS -->
+    <div class="card p-3 mb-4">
+        <h5>❌ Missed Days</h5>
+
+        @if (MissedDays.Any())
+        {
+            <ul class="list-group">
+                @foreach (var day in MissedDays)
+                {
+                    <li class="list-group-item text-danger">
+                        @day.ToString("dddd, dd MMM yyyy")
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-success">No missed days 🎉</p>
+        }
     </div>
 
     <!-- PRIMARY MOODS -->
@@ -78,7 +99,10 @@
             <ul>
                 @foreach (var item in WordCounts.OrderBy(d => d.Key))
                 {
-                    <li>@item.Key.ToString("dd MMM yyyy") — <strong>@item.Value</strong> words</li>
+                    <li>
+                        @item.Key.ToString("dd MMM yyyy") —
+                        <strong>@item.Value</strong> words
+                    </li>
                 }
             </ul>
         }
@@ -91,6 +115,11 @@
 </div>
 
 @code {
+    int CurrentStreak;
+    int LongestStreak;
+
+    List<DateTime> MissedDays = new();
+
     Dictionary<string, int> PrimaryMoods = new();
     Dictionary<string, int> SecondaryMoods = new();
     Dictionary<string, int> Tags = new();
@@ -98,6 +127,11 @@
 
     protected override void OnInitialized()
     {
+        CurrentStreak = JournalService.GetCurrentStreak();
+        LongestStreak = JournalService.GetLongestStreak();
+
+        MissedDays = JournalService.GetMissedDays();
+
         PrimaryMoods = JournalService.GetPrimaryMoodDistribution();
         SecondaryMoods = JournalService.GetSecondaryMoodDistribution();
         Tags = JournalService.GetTagUsage();

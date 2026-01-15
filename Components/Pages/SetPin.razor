@@ -1,0 +1,52 @@
+﻿@page "/set-pin"
+@inject SecurityService SecurityService
+@inject NavigationManager Nav
+
+<div class="content-center">
+
+    <h3>🔐 Set Journal PIN</h3>
+
+    <input type="password"
+           class="form-control mb-2"
+           placeholder="Enter PIN"
+           @bind="Pin1" />
+
+    <input type="password"
+           class="form-control mb-2"
+           placeholder="Confirm PIN"
+           @bind="Pin2" />
+
+    <button class="btn btn-success" @onclick="SavePin">
+        Save PIN
+    </button>
+
+    @if (Error != null)
+    {
+        <p class="text-danger mt-2">@Error</p>
+    }
+
+</div>
+
+@code {
+    string Pin1 = "";
+    string Pin2 = "";
+    string? Error;
+
+    void SavePin()
+    {
+        if (Pin1.Length < 4)
+        {
+            Error = "PIN must be at least 4 digits";
+            return;
+        }
+
+        if (Pin1 != Pin2)
+        {
+            Error = "PINs do not match";
+            return;
+        }
+
+        SecurityService.SetPin(Pin1);
+        Nav.NavigateTo("/journal", true);
+    }
+}

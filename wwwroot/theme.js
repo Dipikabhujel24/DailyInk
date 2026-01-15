@@ -9,6 +9,5 @@ namespace DailyInk.wwwroot
         window.setThemeClass = (themeClass) => {
             document.body.className = themeClass || '';
         };
-
     }
 }

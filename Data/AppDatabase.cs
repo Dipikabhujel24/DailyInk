@@ -11,6 +11,7 @@ public class AppDatabase
     {
         _db = new SQLiteConnection(dbPath);
         _db.CreateTable<JournalEntry>();
+        _db.CreateTable<SecuritySettings>();
     }
 
     public JournalEntry? GetTodayEntry()
@@ -21,6 +22,12 @@ public class AppDatabase
         => _db.Table<JournalEntry>()
               .OrderByDescending(e => e.EntryDate)
               .ToList();
+
+    public SecuritySettings? GetSecuritySettings()
+        => _db.Table<SecuritySettings>().FirstOrDefault();
+
+    public void SaveSecuritySettings(SecuritySettings settings)
+        => _db.InsertOrReplace(settings);
 
     public void SaveToday(JournalEntry entry)
     {

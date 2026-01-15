@@ -31,7 +31,8 @@ namespace DailyInk
             // ====== REPOSITORIES & SERVICES ====== //
             builder.Services.AddSingleton<JournalRepository>();
             builder.Services.AddScoped<JournalService>();
-            builder.Services.AddSingleton<MarkdownService>();
+            builder.Services.AddSingleton<SecurityService>();
+
 
             // Theme Service
             builder.Services.AddSingleton<ThemeService>();

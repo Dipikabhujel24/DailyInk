@@ -1,0 +1,40 @@
+﻿@page "/lock"
+@inject SecurityService SecurityService
+@inject NavigationManager Nav
+
+<div class="content-center text-center">
+
+    <h3>🔒 Secure Journal</h3>
+
+    <input type="password"
+           class="form-control mt-3"
+           placeholder="Enter PIN"
+           @bind="Pin" />
+
+    <button class="btn btn-primary mt-3" @onclick="Unlock">
+        Unlock
+    </button>
+
+    @if (Error != null)
+    {
+        <p class="text-danger mt-2">@Error</p>
+    }
+
+</div>
+
+@code {
+    string Pin = "";
+    string? Error;
+
+    void Unlock()
+    {
+        if (SecurityService.VerifyPin(Pin))
+        {
+            Nav.NavigateTo("/journal", replace: true);
+        }
+        else
+        {
+            Error = "Incorrect PIN";
+        }
+    }
+}

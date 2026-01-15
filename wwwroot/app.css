@@ -1,5 +1,6 @@
 ﻿/* ====== GLOBAL RESET ====== */
 
+@import url('c:\dailyink\dailyink\wwwroot\app.css');
 html, body {
     margin: 0;
     padding: 0;
@@ -198,9 +199,22 @@ html, body {
         cursor: pointer;
     }
 
-/* =========================
-   CALENDAR (CENTERED LIKE JOURNAL)
-========================= */
+/* ===== Rich-Text ===== */
+
+.rich-editor {
+    min-height: 200px;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+    .rich-editor:focus {
+        outline: none;
+    }
+
+
+
+/* ====== CALENDAR ======= */
 
 .calendar-wrapper {
     max-width: 900px;

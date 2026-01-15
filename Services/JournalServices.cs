@@ -87,23 +87,26 @@ public class JournalService
     public List<DateTime> GetMissedDays()
     {
         var entries = GetAllEntries();
+
         if (!entries.Any())
             return new List<DateTime>();
 
         var datesWithEntries = entries
-            .Select(e => e.EntryDate)
+            .Select(e => e.EntryDate.Date)
             .Distinct()
             .ToHashSet();
 
-        var firstDate = entries.Min(e => e.EntryDate);
+        var firstDate = entries.Min(e => e.EntryDate.Date);
         var today = DateTime.Today;
 
         var missedDays = new List<DateTime>();
 
-        for (var date = firstDate; date <= today; date = date.AddDays(1))
+        for (var date = firstDate; date < today; date = date.AddDays(1))
         {
             if (!datesWithEntries.Contains(date))
+            {
                 missedDays.Add(date);
+            }
         }
 
         return missedDays;
