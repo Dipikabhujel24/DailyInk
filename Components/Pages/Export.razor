@@ -1,0 +1,47 @@
+﻿@page "/export"
+@inject JournalService JournalService
+@inject PdfExportService PdfExportService
+
+<div class="content-center">
+
+    <h3>📤 Export Journals (PDF)</h3>
+
+    <div class="card p-3 mb-3">
+        <label>From</label>
+        <input type="date" class="form-control mb-2" @bind="FromDate" />
+
+        <label>To</label>
+        <input type="date" class="form-control mb-3" @bind="ToDate" />
+
+        <button class="btn btn-primary" @onclick="ExportPdf">
+            Export PDF
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="alert alert-info mt-3">@Message</div>
+    }
+
+</div>
+
+@code {
+    DateTime FromDate = DateTime.Today.AddDays(-7);
+    DateTime ToDate = DateTime.Today;
+
+    string? Message;
+
+    async Task ExportPdf()
+    {
+        var entries = JournalService.GetEntriesByDateRange(FromDate, ToDate);
+
+        if (!entries.Any())
+        {
+            Message = "No journal entries found for this date range.";
+            return;
+        }
+
+        var path = await PdfExportService.ExportAsync(entries, FromDate, ToDate);
+        Message = $"PDF exported successfully to:\n{path}";
+    }
+}

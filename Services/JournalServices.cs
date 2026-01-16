@@ -123,6 +123,11 @@ public class JournalService
         return missedDays;
     }
 
+    public List<JournalEntry> GetEntriesByDateRange(DateTime from, DateTime to)
+    {
+        return _repo.GetByDateRange(from, to);
+    }
+
     public Dictionary<string, int> GetPrimaryMoodDistribution()
     {
         return GetAllEntries()

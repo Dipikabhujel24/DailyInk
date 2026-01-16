@@ -96,6 +96,15 @@ public class JournalRepository
             .ToList();
     }
 
+    public List<JournalEntry> GetByDateRange(DateTime from, DateTime to)
+    {
+        return _db.GetAllEntries()
+            .Where(e => e.EntryDate >= from.Date && e.EntryDate <= to.Date)
+            .OrderBy(e => e.EntryDate)
+            .ToList();
+    }
+
+
     public void SaveToday(JournalEntry entry)
         => _db.SaveToday(entry);
 

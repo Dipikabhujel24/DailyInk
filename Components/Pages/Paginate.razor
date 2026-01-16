@@ -38,24 +38,25 @@
     }
 
     <!-- PAGINATION CONTROLS -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
+   <div class="d-flex justify-content-between align-items-center mt-4">
 
-        <button class="btn btn-outline-secondary"
-                disabled="@(CurrentPage == 1)"
-                @onclick="PrevPage">
-            ⬅ Previous
-        </button>
+    <button class="btn btn-outline-secondary"
+            disabled="@(CurrentPage == 1 ? true : false)"
+            @onclick="PrevPage">
+        ⬅ Previous
+    </button>
 
-        <span>
-            Page <strong>@CurrentPage</strong> of <strong>@TotalPages</strong>
-        </span>
+    <span>
+        Page <strong>@CurrentPage</strong> of <strong>@TotalPages</strong>
+    </span>
 
-        <button class="btn btn-outline-secondary"
-                disabled="@(CurrentPage == TotalPages)"
-                @onclick="NextPage">
-            Next ➡
-        </button>
-    </div>
+    <button class="btn btn-outline-secondary"
+            disabled="@(CurrentPage == TotalPages ? true : false)"
+            @onclick="NextPage">
+        Next ➡
+    </button>
+
+</div>
 
 </div>
 

@@ -32,7 +32,7 @@ namespace DailyInk
             builder.Services.AddSingleton<JournalRepository>();
             builder.Services.AddScoped<JournalService>();
             builder.Services.AddSingleton<SecurityService>();
-
+            builder.Services.AddSingleton<PdfExportService>();
 
             // Theme Service
             builder.Services.AddSingleton<ThemeService>();
