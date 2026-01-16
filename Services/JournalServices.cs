@@ -43,6 +43,17 @@ public class JournalService
     {
         return _repo.SearchAndFilter(keyword, fromDate, toDate, mood, tag);
     }
+
+    public List<JournalEntry> GetEntriesPaged(int page, int pageSize)
+    {
+        return _repo.GetPaged(page, pageSize);
+    }
+
+    public int GetTotalEntryCount()
+    {
+        return _repo.GetCount();
+    }
+
     public int GetCurrentStreak()
     {
         var entries = GetAllEntries();

@@ -2,49 +2,45 @@
 @inject JournalService JournalService
 @inject NavigationManager NavigationManager
 
-<div class="calendar-wrapper">
+<h3 class="calendar-title text-center">📅 Journal Calendar</h3>
 
-    <h3 class="calendar-title">📅 Journal Calendar</h3>
-
-    <div class="calendar-header">
-        <button class="btn btn-outline-secondary" @onclick="PrevMonth">◀</button>
-        <h5>@CurrentMonth.ToString("MMMM yyyy")</h5>
-        <button class="btn btn-outline-secondary" @onclick="NextMonth">▶</button>
-    </div>
-
-    <table class="calendar-table">
-        <thead>
-            <tr>
-                <th>Sun</th>
-                <th>Mon</th>
-                <th>Tue</th>
-                <th>Wed</th>
-                <th>Thu</th>
-                <th>Fri</th>
-                <th>Sat</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var week in CalendarWeeks)
-            {
-                <tr>
-                    @foreach (var day in week)
-                    {
-                        <td class="@GetDayClass(day)"
-                            @onclick="() => OpenDay(day)">
-                            @day.Day
-                        </td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <p class="mt-2 text-muted">
-        • Highlighted dates contain journal entries
-    </p>
-
+<div class="calendar-header">
+    <button class="btn btn-outline-secondary" @onclick="PrevMonth">◀</button>
+    <h5 class="mb-0">@CurrentMonth.ToString("MMMM yyyy")</h5>
+    <button class="btn btn-outline-secondary" @onclick="NextMonth">▶</button>
 </div>
+
+<table class="calendar-table">
+    <thead>
+        <tr>
+            <th>Sun</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var week in CalendarWeeks)
+        {
+            <tr>
+                @foreach (var day in week)
+                {
+                    <td class="@GetDayClass(day)"
+                        @onclick="() => OpenDay(day)">
+                        @day.Day
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p class="mt-3 text-muted text-center">
+    • Highlighted dates contain journal entries
+</p>
 
 @code {
     DateTime CurrentMonth = DateTime.Today;

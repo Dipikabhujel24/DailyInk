@@ -1,5 +1,13 @@
 ﻿@page "/view/{EntryId:int}"
 @inject JournalService JournalService
+@inject NavigationManager Nav
+
+
+<button class="btn btn-link mb-3"
+        @onclick="GoBack"
+        style="text-decoration:none; font-size:1.1rem;">
+    ← Back to Entries
+</button>
 
 @if (entry == null)
 {
@@ -39,4 +47,10 @@ else
             .GetAllEntries()
             .FirstOrDefault(e => e.EntryId == EntryId);
     }
+
+    void GoBack()
+{
+    Nav.NavigateTo("/paginate");
+}
+
 }

@@ -40,6 +40,21 @@ public class JournalRepository
             .ToList();
     }
 
+    public List<JournalEntry> GetPaged(int page, int pageSize)
+    {
+        return _db.GetAllEntries()
+            .OrderByDescending(e => e.EntryDate)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public int GetCount()
+    {
+        return _db.GetAllEntries().Count;
+    }
+
+
     public List<JournalEntry> SearchAndFilter(
     string keyword,
     DateTime? fromDate,

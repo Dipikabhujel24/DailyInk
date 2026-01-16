@@ -1,0 +1,105 @@
+﻿@page "/paginate"
+@inject JournalService JournalService
+@inject NavigationManager Nav
+
+<div class="content-center">
+
+    <h2 class="mb-4">📚 Journal Entries (Paginated)</h2>
+
+    @if (!Entries.Any())
+    {
+        <p class="text-muted">No journal entries yet.</p>
+    }
+    else
+    {
+        @foreach (var entry in Entries)
+        {
+            <div class="card p-3 mb-3">
+                <h5>@entry.Title</h5>
+
+                <p class="text-muted">
+                    @entry.EntryDate.ToString("dddd, dd MMM yyyy")
+                </p>
+
+                <p>
+                    @((MarkupString)(
+                                entry.Content.Length > 200
+                                ? entry.Content.Substring(0, 200) + "..."
+                                : entry.Content
+                                ))
+                </p>
+
+                <button class="btn btn-sm btn-outline-primary"
+                        @onclick="() => OpenEntry(entry.EntryId)">
+                    View Entry
+                </button>
+            </div>
+        }
+    }
+
+    <!-- PAGINATION CONTROLS -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+
+        <button class="btn btn-outline-secondary"
+                disabled="@(CurrentPage == 1)"
+                @onclick="PrevPage">
+            ⬅ Previous
+        </button>
+
+        <span>
+            Page <strong>@CurrentPage</strong> of <strong>@TotalPages</strong>
+        </span>
+
+        <button class="btn btn-outline-secondary"
+                disabled="@(CurrentPage == TotalPages)"
+                @onclick="NextPage">
+            Next ➡
+        </button>
+    </div>
+
+</div>
+
+@code {
+    List<JournalEntry> Entries = new();
+
+    int CurrentPage = 1;
+    int PageSize = 5;
+    int TotalEntries;
+    int TotalPages;
+
+    protected override void OnInitialized()
+    {
+        LoadPage();
+    }
+
+    void LoadPage()
+    {
+        Entries = JournalService.GetEntriesPaged(CurrentPage, PageSize);
+
+        TotalEntries = JournalService.GetTotalEntryCount();
+        TotalPages = (int)Math.Ceiling((double)TotalEntries / PageSize);
+    }
+
+    void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+            LoadPage();
+        }
+    }
+
+    void PrevPage()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage--;
+            LoadPage();
+        }
+    }
+
+    void OpenEntry(int id)
+    {
+        Nav.NavigateTo($"/view/{id}");
+    }
+}

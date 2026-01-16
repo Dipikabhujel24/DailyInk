@@ -1,68 +1,80 @@
 ﻿@page "/search"
+@using DailyInk.Models
+
 @inject JournalService JournalService
 @inject NavigationManager NavigationManager
 
-<h3>🔍 Search & Filter Journals</h3>
+<div class="content-center">
 
-<div class="card p-3 mb-3">
-    <input class="form-control"
-           placeholder="Search by title or content"
-           @bind="keyword" />
+    <h3 class="mb-4">🔍 Search & Filter Journals</h3>
 
-    <div class="row mb-2">
-        <div class="col">
-            <label>From</label>
-            <input type="date" class="form-control" @bind="fromDate" />
+    <!-- FILTER CARD -->
+    <div class="card p-4 mb-4">
+        <input class="form-control mb-3"
+               placeholder="Search by title or content"
+               @bind="keyword" />
+
+        <div class="row mb-3">
+            <div class="col">
+                <label class="form-label">From</label>
+                <input type="date" class="form-control" @bind="fromDate" />
+            </div>
+
+            <div class="col">
+                <label class="form-label">To</label>
+                <input type="date" class="form-control" @bind="toDate" />
+            </div>
         </div>
 
-        <div class="col">
-            <label>To</label>
-            <input type="date" class="form-control" @bind="toDate" />
+        <div class="mb-3">
+            <label class="form-label">Primary Mood</label>
+            <select class="form-select" @bind="mood">
+                <option value="">All</option>
+                @foreach (var m in moods)
+                {
+                    <option value="@m">@m</option>
+                }
+            </select>
         </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tag</label>
+            <input class="form-control"
+                   placeholder="e.g. Work, Health"
+                   @bind="tag" />
+        </div>
+
+        <button class="btn btn-primary w-100" @onclick="ApplyFilters">
+            Apply Filters
+        </button>
     </div>
 
-    <div class="mb-2">
-        <label>Primary Mood</label>
-        <select class="form-select" @bind="mood">
-            <option value="">All</option>
-            @foreach (var m in moods)
+    <!-- RESULTS -->
+    @if (results.Any())
+    {
+        <ul class="list-group">
+            @foreach (var entry in results)
             {
-                <option value="@m">@m</option>
+                <li class="list-group-item list-group-item-action"
+                    style="cursor:pointer"
+                    @onclick="() => Open(entry.EntryId)">
+                    <strong>@entry.Title</strong><br />
+                    <small class="text-muted">
+                        @entry.EntryDate.ToString("dd MMM yyyy")
+                        • Mood: @entry.PrimaryMood
+                    </small>
+                </li>
             }
-        </select>
-    </div>
+        </ul>
+    }
+    else if (searched)
+    {
+        <p class="text-muted text-center mt-3">
+            No matching entries found.
+        </p>
+    }
 
-    <div class="mb-2">
-        <label>Tag</label>
-        <input class="form-control"
-               placeholder="e.g. Work, Health"
-               @bind="tag" />
-    </div>
-
-    <button class="btn btn-primary" @onclick="ApplyFilters">
-        Apply Filters
-    </button>
 </div>
-
-@if (results.Any())
-{
-    <ul class="list-group">
-        @foreach (var entry in results)
-        {
-            <li class="list-group-item"
-                style="cursor:pointer"
-                @onclick="() => Open(entry.EntryId)">
-                <strong>@entry.Title</strong><br />
-                <small>@entry.EntryDate.ToString("dd MMM yyyy")</small><br />
-                Mood: @entry.PrimaryMood
-            </li>
-        }
-    </ul>
-}
-else if (searched)
-{
-    <p>No matching entries found.</p>
-}
 
 @code {
     string keyword = "";
