@@ -20,7 +20,7 @@
 
     @if (!string.IsNullOrEmpty(Message))
     {
-        <div class="alert alert-info mt-3">@Message</div>
+        <div class="alert alert-success mt-3">@Message</div>
     }
 
 </div>
@@ -42,6 +42,13 @@
         }
 
         var path = await PdfExportService.ExportAsync(entries, FromDate, ToDate);
-        Message = $"PDF exported successfully to:\n{path}";
+
+        // ✅ OPEN / DOWNLOAD on device
+        await Launcher.OpenAsync(new OpenFileRequest
+        {
+            File = new ReadOnlyFile(path)
+        });
+
+        Message = "PDF exported and opened successfully.";
     }
 }

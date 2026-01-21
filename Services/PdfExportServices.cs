@@ -1,5 +1,7 @@
 ﻿using DailyInk.Models;
-using System.Text;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace DailyInk.Services;
 
@@ -10,33 +12,65 @@ public class PdfExportService
         DateTime from,
         DateTime to)
     {
-        if (!entries.Any())
-            throw new Exception("No entries to export.");
+        QuestPDF.Settings.License = LicenseType.Community;
 
         var fileName = $"DailyInk_{from:yyyyMMdd}_{to:yyyyMMdd}.pdf";
         var filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
 
-        using var stream = File.Create(filePath);
-        using var writer = new StreamWriter(stream, Encoding.UTF8);
-
-        // ⚠ Simple PDF-like structure (acceptable for coursework)
-        writer.WriteLine($"DailyInk Journal Export");
-        writer.WriteLine($"From {from:d} to {to:d}");
-        writer.WriteLine("====================================");
-
-        foreach (var entry in entries)
+        Document.Create(container =>
         {
-            writer.WriteLine();
-            writer.WriteLine(entry.EntryDate.ToString("dd MMM yyyy"));
-            writer.WriteLine(entry.Title);
-            writer.WriteLine($"Primary Mood: {entry.PrimaryMood}");
-            writer.WriteLine($"Secondary: {string.Join(", ", entry.SecondaryMoods)}");
-            writer.WriteLine($"Tags: {entry.Tags}");
-            writer.WriteLine("------------------------------------");
-            writer.WriteLine(entry.Content);
-        }
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(30);
+                page.DefaultTextStyle(x => x.FontSize(11));
 
-        await writer.FlushAsync();
+                page.Content().Column(col =>
+                {
+                    col.Item().Text("DailyInk Journal Export")
+                        .FontSize(18)
+                        .Bold();
+
+                    col.Item()
+                        .PaddingBottom(10)
+                        .Text($"From {from:d} to {to:d}")
+                        .Italic();
+
+                    foreach (var entry in entries)
+                    {
+                        col.Item()
+                            .PaddingVertical(8)
+                            .BorderBottom(1)
+                            .Column(e =>
+                            {
+                                e.Item().Text(entry.EntryDate.ToString("dd MMM yyyy"))
+                                    .Bold();
+
+                                if (!string.IsNullOrWhiteSpace(entry.Title))
+                                    e.Item().Text(entry.Title).Bold();
+
+                                e.Item().Text($"Primary Mood: {entry.PrimaryMood}");
+
+                                if (entry.SecondaryMoods.Any())
+                                    e.Item().Text($"Secondary Moods: {string.Join(", ", entry.SecondaryMoods)}");
+
+                                if (!string.IsNullOrWhiteSpace(entry.Tags))
+                                    e.Item().Text($"Tags: {entry.Tags}");
+
+                                if (!string.IsNullOrWhiteSpace(entry.Content))
+                                {
+                                    e.Item()
+                                        .PaddingTop(5)
+                                        .Text(entry.Content);
+                                }
+                            });
+                    }
+                });
+            });
+        })
+        .GeneratePdf(filePath);
+
+        await Task.CompletedTask;
         return filePath;
     }
 }
