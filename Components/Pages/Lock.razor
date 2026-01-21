@@ -3,38 +3,29 @@
 @inject NavigationManager Nav
 
 <div class="content-center">
+    <div class="card p-4" style="max-width:400px;margin:auto;">
+        <h4>Enter PIN</h4>
 
-    <h3>🔒 Secure Journal</h3>
+        <input type="password" class="form-control mb-3" @bind="pin" />
 
-    <input type="password"
-           class="form-control mt-3"
-           placeholder="Enter PIN"
-           @bind="Pin" />
+        <button class="btn btn-primary w-100" @onclick="Unlock">Unlock</button>
 
-    <button class="btn btn-primary mt-3" @onclick="Unlock">
-        Unlock
-    </button>
-
-    @if (Error != null)
-    {
-        <p class="text-danger mt-2">@Error</p>
-    }
-
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="text-danger mt-2">@error</div>
+        }
+    </div>
 </div>
 
 @code {
-    string Pin = "";
-    string? Error;
+    string pin = "";
+    string? error;
 
     void Unlock()
     {
-        if (SecurityService.VerifyPin(Pin))
-        {
-            Nav.NavigateTo("/journal", replace: true);
-        }
+        if (SecurityService.ValidatePin(pin))
+            Nav.NavigateTo("/", true);
         else
-        {
-            Error = "Incorrect PIN";
-        }
+            error = "Incorrect PIN";
     }
 }

@@ -1,8 +1,11 @@
 ﻿@inherits LayoutComponentBase
 @inject ThemeService ThemeService
+@inject SecurityService SecurityService
 @implements IDisposable
+
 <div class="page @(ThemeService.IsDark ? "dark-theme" : "light-theme")">
     <div class="app-layout">
+
         <aside class="sidebar">
             <NavMenu />
         </aside>
@@ -16,10 +19,80 @@
     </div>
 </div>
 
+@if (!SecurityService.IsUnlocked)
+{
+    <div class="pin-overlay">
+        <div class="pin-modal">
+            <h4 class="mb-3">
+                @(SecurityService.IsPinSet ? "Enter PIN" : "Set PIN")
+            </h4>
+
+            <input type="password"
+                   class="form-control mb-2"
+                   placeholder="PIN"
+                   @bind="pin1" />
+
+            @if (!SecurityService.IsPinSet)
+            {
+                <input type="password"
+                       class="form-control mb-2"
+                       placeholder="Confirm PIN"
+                       @bind="pin2" />
+            }
+
+            <button class="btn btn-primary w-100" @onclick="SubmitPin">
+                Continue
+            </button>
+
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="text-danger mt-2">@error</div>
+            }
+        </div>
+    </div>
+}
+
 @code {
+    string pin1 = "";
+    string pin2 = "";
+    string? error;
+
     protected override void OnInitialized()
     {
         ThemeService.OnThemeChanged += StateHasChanged;
+    }
+
+    void SubmitPin()
+    {
+        error = null;
+
+        if (!SecurityService.IsPinSet)
+        {
+            if (pin1.Length < 4)
+            {
+                error = "PIN must be at least 4 digits";
+                return;
+            }
+
+            if (pin1 != pin2)
+            {
+                error = "PINs do not match";
+                return;
+            }
+
+            SecurityService.SetPin(pin1);
+        }
+        else
+        {
+            if (!SecurityService.ValidatePin(pin1))
+            {
+                error = "Incorrect PIN";
+                return;
+            }
+        }
+
+        pin1 = pin2 = "";
+        StateHasChanged();
     }
 
     public void Dispose()

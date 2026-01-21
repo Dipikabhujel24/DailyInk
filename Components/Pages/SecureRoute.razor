@@ -1,0 +1,32 @@
+﻿@inject SecurityService SecurityService
+@inject NavigationManager Nav
+
+@if (Allowed)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    bool Allowed;
+
+    protected override void OnInitialized()
+    {
+        if (!SecurityService.IsPinSet)
+        {
+            Nav.NavigateTo("/set-pin", true);
+            Allowed = false;
+            return;
+        }
+
+        if (!SecurityService.IsUnlocked)
+        {
+            Nav.NavigateTo("/lock", true);
+            Allowed = false;
+            return;
+        }
+
+        Allowed = true;
+    }
+}
